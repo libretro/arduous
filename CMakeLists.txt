@@ -8,14 +8,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED)
 
 include_directories(include)
 
+set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/link.T")
+
 # Use globbing to find source files.
 # Any source files added to include/ or src/ will automatically be added to the project.
 file(GLOB_RECURSE INCLUDE_FILES ${CMAKE_SOURCE_DIR}/include/*.h)
-file(GLOB_RECURSE SOURCE_FILES_NO_MAIN ${CMAKE_SOURCE_DIR}/src/*.cpp)
-list(REMOVE_ITEM SOURCE_FILES_NO_MAIN ${CMAKE_SOURCE_DIR}/src/main.cpp)
-set(SOURCE_FILES ${SOURCE_FILES_NO_MAIN} ${CMAKE_SOURCE_DIR}/src/main.cpp)
+file(GLOB_RECURSE SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
+# file(GLOB_RECURSE SOURCE_FILES_NO_MAIN ${CMAKE_SOURCE_DIR}/src/*.cpp)
+# list(REMOVE_ITEM SOURCE_FILES_NO_MAIN ${CMAKE_SOURCE_DIR}/src/main.cpp)
+# set(SOURCE_FILES ${SOURCE_FILES_NO_MAIN} ${CMAKE_SOURCE_DIR}/src/main.cpp)
 
-add_executable(clang-blueprint ${INCLUDE_FILES} ${SOURCE_FILES_NO_MAIN} ${SOURCE_FILES})
+add_library(arduous_libretro SHARED ${INCLUDE_FILES} ${SOURCE_FILES})
+# add_executable(clang-blueprint ${INCLUDE_FILES} ${SOURCE_FILES_NO_MAIN} ${SOURCE_FILES})
+
+set(CMAKE_EXE_LINKER_FLAGS "-T ${LINKER_SCRIPT}")
+set_target_properties(arduous_libretro PROPERTIES PREFIX "")
+set_source_files_properties(${CMAKE_SOURCE_DIR}/src/libretro/libretro.cpp PROPERTIES OBJECT_DEPENDS ${LINKER_SCRIPT})
 
 # If external libraries are needed, use find_library() and target_link_libraries()
 # to dynamically link them to your executable. Generally, you'll want to install
