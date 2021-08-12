@@ -5,10 +5,11 @@
 #include <cstring>
 #include <memory>
 
+#include "arduous/arduous.h"
+
 constexpr int FRAME_WIDTH = 128;
 constexpr int FRAME_HEIGHT = 64;
 constexpr float FRAME_ASPECT = 2.0f;
-constexpr int TIMING_FPS = 60;
 constexpr int TIMING_SAMPLE_RATE = 44100;
 
 static inline uint16_t rgb565(uint8_t r, uint8_t g, uint8_t b) {
@@ -23,6 +24,24 @@ static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
 static retro_environment_t environ_cb;
 static retro_audio_sample_t audio_cb;
+
+template <typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args) {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+std::unique_ptr<Arduous> arduous = make_unique<Arduous>();
+
+void update_video() {
+    uint16_t fb[FRAME_WIDTH * FRAME_HEIGHT];
+    memset(fb, BLACK, sizeof(uint16_t) * FRAME_WIDTH * FRAME_HEIGHT);
+    auto bit_fb = arduous->getFrameBuffer();
+    for (int y = 0; y < FRAME_HEIGHT; y++) {
+        for (int x = 0; x < FRAME_WIDTH; x++) {
+            fb[y * FRAME_WIDTH + x] = bit_fb[y * FRAME_WIDTH + x] ? WHITE : BLACK;
+        }
+    }
+    video_cb((void*)fb, FRAME_WIDTH, FRAME_HEIGHT, FRAME_WIDTH * sizeof(uint16_t));
+}
 
 unsigned retro_api_version(void) { return RETRO_API_VERSION; }
 
@@ -99,11 +118,8 @@ void retro_get_system_av_info(struct retro_system_av_info* info) {
 void retro_reset(void) {}
 
 void retro_run(void) {
-    uint16_t fb[FRAME_WIDTH * FRAME_HEIGHT];
-    memset(fb, BLACK, sizeof(uint16_t) * FRAME_WIDTH * FRAME_HEIGHT);
-    fb[0] = rgb565(255, 0, 0);
-    fb[FRAME_WIDTH + 1] = rgb565(0, 255, 0);
-    video_cb((void*)fb, FRAME_WIDTH, FRAME_HEIGHT, FRAME_WIDTH * sizeof(uint16_t));
+    arduous->emulateFrame();
+    update_video();
 }
 
 // libretro unused api functions

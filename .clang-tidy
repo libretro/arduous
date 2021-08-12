@@ -1,2 +1,2 @@
-Checks:           '*,-llvmlibc-restrict-system-libc-headers,-llvmlibc-implementation-in-namespace,-llvmlibc-callee-namespace,-modernize-use-trailing-return-type'
+Checks:           '*,-llvmlibc-restrict-system-libc-headers,-llvmlibc-implementation-in-namespace,-llvmlibc-callee-namespace,-modernize-use-trailing-return-type,-fuchsia-default-arguments-declarations'
 WarningsAsErrors: '*'
