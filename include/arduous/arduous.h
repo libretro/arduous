@@ -5,10 +5,12 @@
 #include <cstdint>
 #include <cstdio>
 
-#include "arduous/atcore.h"
-#include "arduous/ssd1306.h"
+#include "sim_avr.h"
+#include "ssd1306_virt.h"
 
 constexpr int TIMING_FPS = 60;
+constexpr int DISPLAY_WIDTH = 128;
+constexpr int DISPLAY_HEIGHT = 64;
 
 class Arduous {
    public:
@@ -19,8 +21,9 @@ class Arduous {
     Arduous& operator=(Arduous&&) = delete;
     ~Arduous() = default;
 
-    void loadHex(const uint8_t* data, size_t size);
-    void loadBinaryRom(const uint8_t* data, size_t size);
+    void loadFirmware(std::string path);
+    // void loadHex(const uint8_t* data, size_t size);
+    // void loadBinaryRom(const uint8_t* data, size_t size);
     void reset();
     void emulateFrame();
     void update(int steps = 1);
@@ -28,8 +31,10 @@ class Arduous {
     std::bitset<DISPLAY_WIDTH * DISPLAY_HEIGHT> getFrameBuffer();
 
    private:
-    Atcore cpu;
-    SSD1306 screen;
+    // Atcore cpu;
+    avr_t* cpu;
+    // SSD1306 screen;
+    ssd1306_t screen;
 
     size_t cpuTicksPerFrame;
 };

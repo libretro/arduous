@@ -1,39 +1,41 @@
 #include "arduous/arduous.h"
 
-#include "arduous/atcore.h"
-#include "arduous/ssd1306.h"
+#include <stdio.h>
 
-std::vector<uint8_t> SCREEN_TEST_COMMANDS = {
-    0x20, 0x00  // horizontal addressing mode
-};
+#include <iostream>
+#include <string>
 
-std::vector<std::vector<uint8_t>> SCREEN_TEST_DATA = {
-    {0x01, 0x03, 0x07, 0x0F, 0x1F, 0x3F, 0x7F, 0xFF},
-};
+#include "sim_avr.h"
+#include "sim_elf.h"
+#include "ssd1306_virt.h"
 
-size_t SCREEN_TEST_DATA_PTR = 0;
+Arduous::Arduous() = default;
 
-Arduous::Arduous() {
-    cpu = Atcore();
-    screen = SSD1306();
-    for (uint8_t command : SCREEN_TEST_COMMANDS) {
-        screen.pushCommand(command);
-    }
-    cpuTicksPerFrame = cpu.getDesc().clock / TIMING_FPS;
+void Arduous::loadFirmware(std::string path) {
+    elf_firmware_t firmware;
+    elf_read_firmware(path.c_str(), &firmware);
+    fprintf(stderr, "Using mcu %s at frequency %d", firmware.mmcu, firmware.frequency);
+    cpu = avr_make_mcu_by_name(firmware.mmcu);
+    avr_init(cpu);
+    // screen = SSD1306();
+    ssd1306_init(cpu, &screen, DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    ssd1306_wiring_t wiring = {
+        .chip_select.port = 'B',
+        .data_instruction.port = 'B',
+        .data_instruction.pin = 1,
+        .reset.port = 'B',
+        .reset.pin = 3,
+    };
+    ssd1306_connect(&screen, &wiring);
+
+    cpuTicksPerFrame = firmware.frequency * 10 / TIMING_FPS;
+    avr_load_firmware(cpu, &firmware);
 }
 
 void Arduous::emulateFrame() {
     for (int i = 0; i < cpuTicksPerFrame; i++) {
-        cpu.tick();
+        avr_run(cpu);
     }
-
-    for (uint8_t data : SCREEN_TEST_DATA[SCREEN_TEST_DATA_PTR]) {
-        screen.pushData(data);
-    }
-    SCREEN_TEST_DATA_PTR++;
-    SCREEN_TEST_DATA_PTR %= SCREEN_TEST_DATA.size();
-
-    screen.tick();
 }
 
 void Arduous::update(int steps) {
@@ -42,4 +44,20 @@ void Arduous::update(int steps) {
     }
 }
 
-std::bitset<DISPLAY_WIDTH * DISPLAY_HEIGHT> Arduous::getFrameBuffer() { return screen.getFrameBuffer(); }
+std::bitset<DISPLAY_WIDTH * DISPLAY_HEIGHT> Arduous::getFrameBuffer() {
+    std::bitset<DISPLAY_WIDTH * DISPLAY_HEIGHT> fb;
+
+    for (int p = 0; p < screen.pages; p++) {
+        for (int c = 0; c < screen.columns; c++) {
+            uint8_t vram_byte = screen.vram[p][c];
+
+            for (int i = 0; i < 8; i++) {
+                if (vram_byte & (1 << i)) {
+                    fb[(p * 8 + i) * DISPLAY_WIDTH + c] = true;
+                }
+            }
+        }
+    }
+
+    return fb;
+}

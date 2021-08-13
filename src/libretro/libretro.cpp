@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "arduous/arduous.h"
+#include "sim_elf.h"
 
 constexpr int FRAME_WIDTH = 128;
 constexpr int FRAME_HEIGHT = 64;
@@ -58,8 +59,8 @@ bool retro_load_game(const struct retro_game_info* info) {
 
     environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
 
-    if (info && info->data) {
-        // TODO(jmaroeder): load data
+    if (info && info->path) {
+        arduous->loadFirmware(info->path);
     }
 
     return true;
@@ -99,7 +100,7 @@ void retro_get_system_info(struct retro_system_info* info) {
     info->library_name = "arduous";
     info->library_version = "0.1.0";
     info->need_fullpath = false;
-    info->valid_extensions = "hex";
+    info->valid_extensions = "hex|axf|elf";
 }
 
 void retro_get_system_av_info(struct retro_system_av_info* info) {

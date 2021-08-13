@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <cstdio>
+#include <vector>
 
 struct AtcoreDesc {
     size_t flash = 32 * 1024;
@@ -24,7 +25,37 @@ class Atcore {
 
    private:
     AtcoreDesc desc;
-    size_t pc = 0;
+
+    std::vector<uint8_t> memory;
+    std::vector<uint8_t> flash;
+    std::vector<uint8_t> eeprom;
+
+    // Registers
+    uint32_t pc;
+    uint16_t sp;
+    uint8_t sreg;
+
+    // Instructions
+    // https://en.wikipedia.org/wiki/Atmel_AVR_instruction_set#Instruction_encoding
+
+    void doNOP();
+    void doMOVW();
+    void doMULS();
+    void doMULSU();
+    void doFMUL();
+    void doFMULS();
+    void doCP();
+    void doSUB();
+    void doADD();
+    void doCPSE();
+    void doAND();
+    void doEOR();
+    void doOR();
+    void doMOV();
+    void doCPI();
+    void doSUBI();
+    void doORI();
+    void doANDI();
 };
 
 #endif

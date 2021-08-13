@@ -6,8 +6,6 @@ project(arduous VERSION 0.1.0)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED)
 
-include_directories(include)
-
 set(LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/link.T")
 
 # Use globbing to find source files.
@@ -19,7 +17,25 @@ file(GLOB_RECURSE SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 # set(SOURCE_FILES ${SOURCE_FILES_NO_MAIN} ${CMAKE_SOURCE_DIR}/src/main.cpp)
 
 add_library(arduous_libretro SHARED ${INCLUDE_FILES} ${SOURCE_FILES})
-# add_executable(clang-blueprint ${INCLUDE_FILES} ${SOURCE_FILES_NO_MAIN} ${SOURCE_FILES})
+
+find_library(LIB_ELF elf)
+
+add_dependencies(arduous_libretro simavr)
+
+target_include_directories(
+    arduous_libretro
+    PUBLIC include
+    PUBLIC ${CMAKE_BINARY_DIR}/simavr/src/simavr/simavr/sim
+    PUBLIC ${CMAKE_BINARY_DIR}/simavr/src/simavr/examples/parts
+)
+
+target_link_libraries(
+    arduous_libretro
+    ${CMAKE_BINARY_DIR}/simavr/src/simavr/simavr/obj/libsimavr.a
+    ${CMAKE_BINARY_DIR}/simavr/src/simavr/examples/parts/obj/libsimavrparts.a
+    ${CMAKE_BINARY_DIR}/simavr/src/simavr/examples/parts/obj/ssd1306_virt.o
+    ${LIB_ELF}
+)
 
 set(CMAKE_EXE_LINKER_FLAGS "-T ${LINKER_SCRIPT}")
 set_target_properties(arduous_libretro PROPERTIES PREFIX "")
@@ -35,7 +51,8 @@ set_source_files_properties(${CMAKE_SOURCE_DIR}/src/libretro/libretro.cpp PROPER
 # Include extra CMake files that are used for testing and linting.
 # include(${CMAKE_SOURCE_DIR}/cmake/unit_test.cmake)
 include(${CMAKE_SOURCE_DIR}/cmake/clang_tools.cmake)
-include(${CMAKE_SOURCE_DIR}/cmake/cppcheck.cmake)
+# include(${CMAKE_SOURCE_DIR}/cmake/cppcheck.cmake)
+include(${CMAKE_SOURCE_DIR}/cmake/simavr.cmake)
 
 # Enable all warnings except for no-sign-compare, which Clang disables
 # by default.
