@@ -60,7 +60,8 @@ bool retro_load_game(const struct retro_game_info* info) {
     environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
 
     if (info && info->path) {
-        arduous->loadFirmware(info->path);
+        // arduous->loadFirmware(info->path);
+        arduous->loadHexFile(info->path);
     }
 
     return true;
@@ -99,7 +100,7 @@ void retro_get_system_info(struct retro_system_info* info) {
     memset(info, 0, sizeof(retro_system_info));
     info->library_name = "arduous";
     info->library_version = "0.1.0";
-    info->need_fullpath = false;
+    info->need_fullpath = true;
     info->valid_extensions = "hex|axf|elf";
 }
 
@@ -116,9 +117,17 @@ void retro_get_system_av_info(struct retro_system_av_info* info) {
     environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &pixel_format);
 }
 
-void retro_reset(void) {}
+void retro_reset(void) { arduous.reset(); }
 
 void retro_run(void) {
+    ArduousButtonState buttonState;
+    buttonState.buttonUp = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP);
+    buttonState.buttonDown = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN);
+    buttonState.buttonLeft = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT);
+    buttonState.buttonRight = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT);
+    buttonState.buttonA = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A);
+    buttonState.buttonB = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B);
+    arduous->setButtonState(buttonState);
     arduous->emulateFrame();
     update_video();
 }
