@@ -148,16 +148,19 @@ std::vector<int16_t> Arduous::getAudioBuffer() {
     return audioBuffer;
 }
 
-int16_t Arduous::getCurrentSpeakerSample() { return (speakerPins[0] + speakerPins[1]) << 14; }
+int16_t Arduous::getCurrentSpeakerSample() { return speakerPins[0] ? -4096 : 4095; }
 
 void Arduous::extendAudioBuffer() {
     // multiply by 2 to get interleaved stereo
     int currentSampleIndex = 2 * std::min((cpu->cycle - frameStartCycle) / cyclesPerAudioSample,
                                           static_cast<uint64_t>(audioSamplesPerVideoFrame));
-    uint16_t currentSample = getCurrentSpeakerSample();
+    int count = 0;
+    int16_t currentSample = getCurrentSpeakerSample();
     for (uint i = audioBuffer.size(); i < currentSampleIndex; i++) {
         audioBuffer.push_back(currentSample);
+        count++;
     }
+    fprintf(stderr, "pushed %x %d times\n", currentSample, count);
 }
 
 void Arduous::soundPinCallback(struct avr_irq_t* irq, uint32_t value, void* param) {
