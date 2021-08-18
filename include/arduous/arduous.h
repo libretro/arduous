@@ -1,16 +1,19 @@
 #ifndef ARDUOUS_ARDUOUS_H
 #define ARDUOUS_ARDUOUS_H
 
+#include <array>
 #include <bitset>
 #include <cstdint>
 #include <cstdio>
+#include <vector>
 
 #include "sim_avr.h"
 #include "ssd1306_virt.h"
 
-constexpr int TIMING_FPS = 60;
-constexpr int DISPLAY_WIDTH = 128;
-constexpr int DISPLAY_HEIGHT = 64;
+constexpr unsigned int TIMING_FPS = 60;
+constexpr unsigned int TIMING_SAMPLE_RATE = 48000;
+constexpr unsigned int DISPLAY_WIDTH = 128;
+constexpr unsigned int DISPLAY_HEIGHT = 64;
 
 typedef struct {
     bool buttonUp = false;
@@ -22,6 +25,11 @@ typedef struct {
 } ArduousButtonState;
 
 class Arduous {
+    typedef struct {
+        Arduous* self;
+        int speakerPin;
+    } PinCallbackParamT;
+
    public:
     Arduous();
     Arduous(const Arduous&) = delete;
@@ -39,7 +47,8 @@ class Arduous {
     void update(int steps = 1);
     void setButtonState(ArduousButtonState newButtonState);
 
-    std::bitset<DISPLAY_WIDTH * DISPLAY_HEIGHT> getFrameBuffer();
+    std::bitset<DISPLAY_WIDTH * DISPLAY_HEIGHT> getVideoFrameBuffer();
+    std::vector<int16_t> getAudioBuffer();
 
    private:
     // Atcore cpu;
@@ -48,9 +57,23 @@ class Arduous {
     ssd1306_t screen;
 
     std::string mmcu = "atmega32u4";
-    size_t freq = 16000000;
-    size_t cpuTicksPerFrame;
+    uint64_t freq = 16000000;
+    uint64_t cyclesPerVideoFrame;
+    uint64_t cyclesPerAudioSample;
+    unsigned int audioSamplesPerVideoFrame;
+    uint64_t frameStartCycle;
+    uint64_t frameEndCycle;
+
     ArduousButtonState buttonState = {};
+    std::array<PinCallbackParamT, 2> pinCallbackParamTs;
+
+    std::bitset<2> speakerPins;
+    std::vector<int16_t> audioBuffer;
+
+    int16_t getCurrentSpeakerSample();
+    void extendAudioBuffer();
+
+    static void soundPinCallback(struct avr_irq_t* irq, uint32_t value, void* param);
 };
 
 #endif
