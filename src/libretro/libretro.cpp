@@ -13,7 +13,7 @@ constexpr int FRAME_HEIGHT = 64;
 constexpr float FRAME_ASPECT = 2.0f;
 
 uint16_t fb[FRAME_WIDTH * FRAME_HEIGHT];
-int16_t audio_buffer[TIMING_SAMPLE_RATE * 2];
+int16_t audio_buffer[TIMING_SAMPLE_RATE / TIMING_FPS * 2];
 
 static inline uint16_t rgb565(uint8_t r, uint8_t g, uint8_t b) {
     return ((r >> 3U) << 11U) | ((g >> 2U) << 5U) | ((b >> 3U) << 0U);
@@ -53,8 +53,8 @@ void update_video() {
 }
 
 void update_audio() {
-    memcpy(audio_buffer, arduous->getAudioBuffer().data(), sizeof(uint16_t) * TIMING_SAMPLE_RATE);
-    audio_cb(audio_buffer, TIMING_SAMPLE_RATE);
+    memcpy(audio_buffer, arduous->getAudioBuffer().data(), TIMING_SAMPLE_RATE / TIMING_FPS * 2);
+    audio_cb(audio_buffer, TIMING_SAMPLE_RATE / TIMING_FPS);
 }
 
 unsigned retro_api_version(void) { return RETRO_API_VERSION; }

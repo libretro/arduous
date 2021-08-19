@@ -1,10 +1,11 @@
 #include "arduous/arduous.h"
 
-#include <stdio.h>
-
 #include <algorithm>
+#include <cstdint>
+#include <cstdio>
 #include <functional>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 
 #include "avr_ioport.h"
@@ -142,25 +143,32 @@ std::vector<int16_t> Arduous::getAudioBuffer() {
     if (audioBuffer.size() < audioSamplesPerVideoFrame * 2) {
         extendAudioBuffer();
     }
-    if (audioBuffer.size() != audioSamplesPerVideoFrame * 2) {
-        fprintf(stderr, "audioBuffer.size() == %d, expected %d", audioBuffer.size(), audioSamplesPerVideoFrame * 2);
-    }
     return audioBuffer;
 }
 
-int16_t Arduous::getCurrentSpeakerSample() { return speakerPins[0] ? -4096 : 4095; }
+int16_t Arduous::getCurrentSpeakerSample() {
+    switch (speakerPins.to_ulong()) {
+        case 0:
+        case 3:
+            return 0;
+            break;
+        case 1:
+            return INT16_MAX;
+            break;
+        case 2:
+            return INT16_MIN;
+        default:
+            throw std::runtime_error("Invalid speaker pin value");
+    }
+}
 
 void Arduous::extendAudioBuffer() {
-    // multiply by 2 to get interleaved stereo
-    int currentSampleIndex = 2 * std::min((cpu->cycle - frameStartCycle) / cyclesPerAudioSample,
-                                          static_cast<uint64_t>(audioSamplesPerVideoFrame));
-    int count = 0;
+    int endSampleIndex = 2 * std::min((cpu->cycle - frameStartCycle) / cyclesPerAudioSample,
+                                      static_cast<uint64_t>(audioSamplesPerVideoFrame));
     int16_t currentSample = getCurrentSpeakerSample();
-    for (uint i = audioBuffer.size(); i < currentSampleIndex; i++) {
+    for (uint i = audioBuffer.size(); i < endSampleIndex; i++) {
         audioBuffer.push_back(currentSample);
-        count++;
     }
-    fprintf(stderr, "pushed %x %d times\n", currentSample, count);
 }
 
 void Arduous::soundPinCallback(struct avr_irq_t* irq, uint32_t value, void* param) {
@@ -168,6 +176,4 @@ void Arduous::soundPinCallback(struct avr_irq_t* irq, uint32_t value, void* para
     Arduous* self = pinCallbackParamT->self;
     self->extendAudioBuffer();
     self->speakerPins[pinCallbackParamT->speakerPin] = value & 0x1;
-
-    // fprintf(stderr, "[%lld]: [%d]: %d\n", self->cpu->cycle, pinCallbackParamT->speakerPin, value & 0x1);
 }
