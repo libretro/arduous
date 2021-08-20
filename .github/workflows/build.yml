@@ -1,4 +1,4 @@
-name: Build
+name: CI
 on:
   push:
     branches: [main]
@@ -14,8 +14,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-avr avr-libc libelf-dev
       - name: Configure build
-        run: |
-          mkdir build
-          cmake -Bbuild -H.
+        run: cmake -Bbuild -H.
       - name: Build
         run: cmake --build ./build
