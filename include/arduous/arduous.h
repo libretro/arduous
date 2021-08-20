@@ -49,6 +49,9 @@ class Arduous {
 
     std::bitset<DISPLAY_WIDTH * DISPLAY_HEIGHT> getVideoFrameBuffer();
     std::vector<int16_t> getAudioBuffer();
+    size_t getSaveSize();
+    bool save(void* data, size_t size);
+    bool load(const void* data, size_t size);
 
    private:
     // Atcore cpu;

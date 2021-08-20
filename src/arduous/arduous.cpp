@@ -146,6 +146,112 @@ std::vector<int16_t> Arduous::getAudioBuffer() {
     return audioBuffer;
 }
 
+size_t Arduous::getSaveSize() {
+    size_t size = sizeof(int)                  // cpu->state
+                  + sizeof(avr_cycle_count_t)  // cpu->cycle
+                  + sizeof(avr_cycle_count_t)  // cpu->run_cycle_count
+                  + sizeof(avr_cycle_count_t)  // cpu->run_cycle_limit
+                  + sizeof(uint8_t) * 8        // cpu->sreg
+                  + sizeof(int8_t)             // cpu->interrupt_state
+                  + sizeof(avr_flashaddr_t)    // cpu->pc
+                  + sizeof(avr_flashaddr_t)    // cpu->reset_pc
+                  + cpu->ramend + 1            // cpu->data
+
+                  + sizeof(ssd1306_virt_cursor_t)                                // screen->cursor
+                  + sizeof(uint8_t) * SSD1306_VIRT_PAGES * SSD1306_VIRT_COLUMNS  // screen->vram
+                  + sizeof(uint16_t)                                             // screen->flags
+                  + sizeof(uint8_t)                                              // screen->command_register
+                  + sizeof(uint8_t)                                              // screen->contrast_register
+                  + sizeof(uint8_t)                                              // screen->cs_pin
+                  + sizeof(uint8_t)                                              // screen->di_pin
+                  + sizeof(uint8_t)                                              // screen->spi_data
+                  + sizeof(uint8_t)                                              // screen->reg_write_sz
+                  + sizeof(ssd1306_addressing_mode_t)                            // screen->addr_mode
+                  + sizeof(uint8_t)                                              // screen->twi_selected
+                  + sizeof(uint8_t)                                              // screen->twi_index
+        ;
+    return size;
+}
+
+bool Arduous::save(void* data, size_t size) {
+    auto* buffer = static_cast<uint8_t*>(data);
+    memcpy(buffer, &cpu->state, sizeof(int));
+    buffer += sizeof(int);
+    memcpy(buffer, &cpu->cycle, sizeof(avr_cycle_count_t));
+    buffer += sizeof(avr_cycle_count_t);
+    memcpy(buffer, &cpu->run_cycle_count, sizeof(avr_cycle_count_t));
+    buffer += sizeof(avr_cycle_count_t);
+    memcpy(buffer, &cpu->run_cycle_limit, sizeof(avr_cycle_count_t));
+    buffer += sizeof(avr_cycle_count_t);
+    memcpy(buffer, cpu->sreg, sizeof(uint8_t) * 8);
+    buffer += sizeof(uint8_t) * 8;
+    memcpy(buffer, &cpu->interrupt_state, sizeof(int8_t));
+    buffer += sizeof(int8_t);
+    memcpy(buffer, &cpu->pc, sizeof(avr_flashaddr_t));
+    buffer += sizeof(avr_flashaddr_t);
+    memcpy(buffer, &cpu->reset_pc, sizeof(avr_flashaddr_t));
+    buffer += sizeof(avr_flashaddr_t);
+    memcpy(buffer, cpu->data, cpu->ramend + 1);
+    buffer += cpu->ramend + 1;
+    // TODO(jmaroeder): cpu->cycle_timers
+    // for (int i = 0; i < MAX_CYCLE_TIMERS; i++) {
+    //     memcpy(buffer, &cpu->cycle_timers.timer_slots[i].when, sizeof(avr_cycle_count_t));
+    //     buffer += sizeof(avr_cycle_count_t);
+    // }
+
+    // TODO(jmaroeder): cpu->interrupts
+    // TODO(jmaroeder): cpu->eeprom?
+
+    memcpy(buffer, &screen.cursor, sizeof(ssd1306_virt_cursor_t));
+    buffer += sizeof(ssd1306_virt_cursor_t);
+    memcpy(buffer, screen.vram, sizeof(uint8_t) * SSD1306_VIRT_PAGES * SSD1306_VIRT_COLUMNS);
+    buffer += sizeof(uint8_t) * SSD1306_VIRT_PAGES * SSD1306_VIRT_COLUMNS;
+    memcpy(buffer, &screen.flags, sizeof(uint16_t));
+    buffer += sizeof(uint16_t);
+    memcpy(buffer, &screen.command_register, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(buffer, &screen.contrast_register, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(buffer, &screen.cs_pin, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(buffer, &screen.di_pin, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(buffer, &screen.spi_data, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(buffer, &screen.reg_write_sz, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(buffer, &screen.addr_mode, sizeof(ssd1306_addressing_mode_t));
+    buffer += sizeof(ssd1306_addressing_mode_t);
+    memcpy(buffer, &screen.twi_selected, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(buffer, &screen.twi_index, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    return true;
+}
+
+bool Arduous::load(const void* data, size_t size) {
+    auto* buffer = static_cast<const uint8_t*>(data);
+    memcpy(&cpu->state, buffer, sizeof(int));
+    buffer += sizeof(int);
+    memcpy(&cpu->cycle, buffer, sizeof(avr_cycle_count_t));
+    buffer += sizeof(avr_cycle_count_t);
+    memcpy(&cpu->run_cycle_count, buffer, sizeof(avr_cycle_count_t));
+    buffer += sizeof(avr_cycle_count_t);
+    memcpy(&cpu->run_cycle_limit, buffer, sizeof(avr_cycle_count_t));
+    buffer += sizeof(avr_cycle_count_t);
+    memcpy(cpu->sreg, buffer, sizeof(uint8_t) * 8);
+    buffer += sizeof(uint8_t) * 8;
+    memcpy(&cpu->interrupt_state, buffer, sizeof(int8_t));
+    buffer += sizeof(int8_t);
+    memcpy(&cpu->pc, buffer, sizeof(avr_flashaddr_t));
+    buffer += sizeof(avr_flashaddr_t);
+    memcpy(&cpu->reset_pc, buffer, sizeof(avr_flashaddr_t));
+    buffer += sizeof(avr_flashaddr_t);
+    memcpy(cpu->data, buffer, cpu->ramend + 1);
+    buffer += cpu->ramend + 1;
+    return true;
+}
+
 int16_t Arduous::getCurrentSpeakerSample() {
     switch (speakerPins.to_ulong()) {
         case 0:

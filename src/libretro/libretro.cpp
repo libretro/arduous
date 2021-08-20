@@ -33,7 +33,8 @@ static retro_video_refresh_t video_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
 static retro_environment_t environ_cb;
-static retro_audio_sample_batch_t audio_cb;
+static retro_audio_sample_t audio_cb;
+static retro_audio_sample_batch_t audio_batch_cb;
 
 template <typename T, typename... Args>
 std::unique_ptr<T> make_unique(Args&&... args) {
@@ -54,7 +55,7 @@ void update_video() {
 
 void update_audio() {
     memcpy(audio_buffer, arduous->getAudioBuffer().data(), TIMING_SAMPLE_RATE / TIMING_FPS * 2);
-    audio_cb(audio_buffer, TIMING_SAMPLE_RATE / TIMING_FPS);
+    audio_batch_cb(audio_buffer, TIMING_SAMPLE_RATE / TIMING_FPS);
 }
 
 unsigned retro_api_version(void) { return RETRO_API_VERSION; }
@@ -98,7 +99,8 @@ void retro_set_environment(retro_environment_t cb) {
 }
 
 void retro_set_video_refresh(retro_video_refresh_t cb) { video_cb = cb; }
-void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_cb = cb; }
+void retro_set_audio_sample(retro_audio_sample_t cb) { audio_cb = cb; }
+void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_cb = cb; }
 void retro_set_input_poll(retro_input_poll_t cb) { input_poll_cb = cb; }
 void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
@@ -154,9 +156,9 @@ void retro_run(void) {
 
 // TODO(jmaroeder): support serialize/unserialize to enable savestates and rewind
 size_t retro_get_memory_size(unsigned id) { return 0; }
-size_t retro_serialize_size(void) { return 0; }
-bool retro_serialize(void* data, size_t size) { return false; }
-bool retro_unserialize(const void* data, size_t size) { return false; }
+size_t retro_serialize_size(void) { return arduous->getSaveSize(); }
+bool retro_serialize(void* data, size_t size) { return arduous->save(data, size); }
+bool retro_unserialize(const void* data, size_t size) { return arduous->load(data, size); }
 
 // libretro unused api functions
 void retro_cheat_reset(void) {}
@@ -165,4 +167,3 @@ bool retro_load_game_special(unsigned game_type, const struct retro_game_info* i
 void retro_set_controller_port_device(unsigned port, unsigned device) {}
 void* retro_get_memory_data(unsigned id) { return nullptr; }
 void retro_deinit(void) {}
-void retro_set_audio_sample(retro_audio_sample_t cb) {}
