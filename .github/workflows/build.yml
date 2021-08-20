@@ -12,7 +12,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-avr avr-libc libelf-dev
+          sudo apt-get install -y gcc-avr avr-libc libelf-dev freeglut3 freeglut3-dev
       - name: Configure build
         run: cmake -Bbuild -H.
       - name: Build
