@@ -35,7 +35,6 @@ target_link_libraries(
     arduous_libretro
     ${CMAKE_BINARY_DIR}/simavr/src/simavr/simavr/obj/libsimavr.a
     ${CMAKE_BINARY_DIR}/simavr/src/simavr/examples/parts/obj/libsimavrparts.a
-    ${CMAKE_BINARY_DIR}/simavr/src/simavr/examples/parts/obj/ssd1306_virt.o
     ${LIB_ELF}
 )
 
