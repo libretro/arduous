@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
+set(CMAKE_CXX_COMPILER "clang++")
 project(arduous VERSION 0.1.0)
 
 # Require C++11.
@@ -57,7 +58,6 @@ include(${CMAKE_SOURCE_DIR}/cmake/simavr.cmake)
 # Enable all warnings except for no-sign-compare, which Clang disables
 # by default.
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-sign-compare")
-set(CMAKE_CXX_COMPILER "clang++")
 
 option(WERROR "Turn warnings into errors" ON)
 if (WERROR)
