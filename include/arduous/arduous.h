@@ -15,20 +15,20 @@ constexpr unsigned int TIMING_SAMPLE_RATE = 48000;
 constexpr unsigned int DISPLAY_WIDTH = 128;
 constexpr unsigned int DISPLAY_HEIGHT = 64;
 
-typedef struct {
+struct ArduousButtonState {
     bool buttonUp = false;
     bool buttonRight = false;
     bool buttonLeft = false;
     bool buttonDown = false;
     bool buttonA = false;
     bool buttonB = false;
-} ArduousButtonState;
+};
 
 class Arduous {
-    typedef struct {
+    struct PinCallbackParamT {
         Arduous* self;
         int speakerPin;
-    } PinCallbackParamT;
+    };
 
    public:
     Arduous();

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
+#include <cstring>
 #include <functional>
 #include <iostream>
 #include <stdexcept>
@@ -55,12 +56,9 @@ void Arduous::init(uint8_t* boot, uint32_t bootBase, uint32_t bootSize) {
 
     ssd1306_init(cpu, &screen, DISPLAY_WIDTH, DISPLAY_HEIGHT);
     ssd1306_wiring_t wiring = {
-        .chip_select.port = 'D',
-        .chip_select.pin = 6,
-        .data_instruction.port = 'D',
-        .data_instruction.pin = 4,
-        .reset.port = 'D',
-        .reset.pin = 7,
+        .chip_select = {.port = 'D', .pin = 6},
+        .data_instruction = {.port = 'D', .pin = 4},
+        .reset = {.port = 'D', .pin = 7},
     };
     ssd1306_connect(&screen, &wiring);
 
