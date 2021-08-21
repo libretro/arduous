@@ -22,3 +22,9 @@ jobs:
         with:
           name: arduous_libretro.linux.so
           path: build/arduous_libretro.so
+      - uses: eine/tip@master
+        with:
+          tag: latest
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            arduous_libretro.linux.so
