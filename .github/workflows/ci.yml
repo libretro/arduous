@@ -22,9 +22,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: linux
-          path: |
-            build/*.so
+          path: build/*.so
   release:
+    if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
     needs: [build_ubuntu]
     runs-on: ubuntu-latest
     steps:
