@@ -34,12 +34,11 @@ jobs:
         run: ls -R
       - name: Release latest
         if: ${{ github.ref == 'refs/heads/main' }}
-        uses: softprops/action-gh-release@v1
+        # eine/tip force-pushes to the specified tag
+        uses: eine/tip@master
         with:
           files: ${{ env.RELEASE_FILES }}
-          name: latest
-          prerelease: true
-          tag_name: latest
+          tag: latest
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Release tagged
         if: startsWith(github.ref, 'refs/tags/v')
