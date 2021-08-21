@@ -26,5 +26,4 @@ jobs:
         with:
           tag: latest
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: |
-            arduous_libretro.linux.so
+          files: build/arduous_libretro.so
