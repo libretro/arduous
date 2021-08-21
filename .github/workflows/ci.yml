@@ -1,11 +1,12 @@
 name: CI
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+on: push
+
+env:
+  RELEASE_FILES: |
+    linux/*.so
+
 jobs:
-  build:
+  build_ubuntu:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,5 +21,28 @@ jobs:
       - name: Store artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: arduous_libretro.linux.so
-          path: build/arduous_libretro.so
+          name: linux
+          path: |
+            build/*.so
+  release:
+    needs: [build_ubuntu]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+      - name: Display structure of downloaded files
+        run: ls -R
+      - name: Release latest
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.RELEASE_FILES }}
+          name: latest
+          prerelease: true
+          tag_name: latest
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release tagged
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.RELEASE_FILES }}
