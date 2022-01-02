@@ -55,6 +55,8 @@ class Arduous {
 
     size_t getRamSize();
     void *getRam();
+    size_t getEEPROMSize();
+    void *getEEPROM();
 
    private:
     // Atcore cpu;

@@ -10,6 +10,7 @@
 #include <string>
 
 #include "avr_ioport.h"
+#include "avr_eeprom.h"
 #include "sim_avr.h"
 #include "sim_elf.h"
 #include "sim_hex.h"
@@ -167,7 +168,8 @@ size_t Arduous::getSaveSize() {
                   + sizeof(ssd1306_addressing_mode_t)                            // screen->addr_mode
                   + sizeof(uint8_t)                                              // screen->twi_selected
                   + sizeof(uint8_t)                                              // screen->twi_index
-        ;
+	          + getEEPROMSize()
+	;
     return size;
 }
 
@@ -224,6 +226,9 @@ bool Arduous::save(void* data, size_t size) {
     buffer += sizeof(uint8_t);
     memcpy(buffer, &screen.twi_index, sizeof(uint8_t));
     buffer += sizeof(uint8_t);
+    int esize = getEEPROMSize();
+    memcpy(buffer, getEEPROM(), esize);
+    buffer += esize;
     return true;
 }
 
@@ -273,6 +278,9 @@ bool Arduous::load(const void* data, size_t size) {
     memcpy(&screen.twi_index, buffer, sizeof(uint8_t));
     buffer += sizeof(uint8_t);
 
+    int esize = getEEPROMSize();
+    memcpy(getEEPROM(), buffer, esize);
+    buffer += esize;
     return true;
 }
 
@@ -282,6 +290,22 @@ size_t Arduous::getRamSize() {
 
 void *Arduous::getRam() {
     return cpu->data;
+}
+
+size_t Arduous::getEEPROMSize() {
+    return 0x400;
+}
+
+void *Arduous::getEEPROM() {
+    avr_eeprom_desc_t d = {
+	.ee = 0,
+	.offset = 0,
+	.size = 0
+    };
+    d.size = getEEPROMSize();
+    avr_ioctl(cpu, AVR_IOCTL_EEPROM_GET, &d);
+
+    return d.ee;
 }
 
 int16_t Arduous::getCurrentSpeakerSample() {

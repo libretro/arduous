@@ -163,6 +163,8 @@ size_t retro_get_memory_size(unsigned id) {
     {
     case RETRO_MEMORY_SYSTEM_RAM: // System Memory
 	return arduous->getRamSize();
+    case RETRO_MEMORY_SAVE_RAM: // EEPROM
+	return arduous->getEEPROMSize();
     }
     return 0;
 }
@@ -172,6 +174,8 @@ void* retro_get_memory_data(unsigned id) {
     {
     case RETRO_MEMORY_SYSTEM_RAM: // System Memory
 	return arduous->getRam();
+    case RETRO_MEMORY_SAVE_RAM: // EEPROM
+	return arduous->getEEPROM();
     }
     return 0;
 }
