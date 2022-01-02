@@ -154,7 +154,6 @@ void retro_run(void) {
     update_audio();
 }
 
-// TODO(jmaroeder): support serialize/unserialize to enable savestates and rewind
 size_t retro_serialize_size(void) { return arduous->getSaveSize(); }
 bool retro_serialize(void* data, size_t size) { return arduous->save(data, size); }
 bool retro_unserialize(const void* data, size_t size) { return arduous->load(data, size); }

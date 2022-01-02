@@ -247,6 +247,32 @@ bool Arduous::load(const void* data, size_t size) {
     buffer += sizeof(avr_flashaddr_t);
     memcpy(cpu->data, buffer, cpu->ramend + 1);
     buffer += cpu->ramend + 1;
+
+    memcpy(&screen.cursor, buffer, sizeof(ssd1306_virt_cursor_t));
+    buffer += sizeof(ssd1306_virt_cursor_t);
+    memcpy(screen.vram, buffer, sizeof(uint8_t) * SSD1306_VIRT_PAGES * SSD1306_VIRT_COLUMNS);
+    buffer += sizeof(uint8_t) * SSD1306_VIRT_PAGES * SSD1306_VIRT_COLUMNS;
+    memcpy(&screen.flags, buffer, sizeof(uint16_t));
+    buffer += sizeof(uint16_t);
+    memcpy(&screen.command_register, buffer, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(&screen.contrast_register, buffer, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(&screen.cs_pin, buffer, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(&screen.di_pin, buffer, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(&screen.spi_data, buffer, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(&screen.reg_write_sz, buffer, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(&screen.addr_mode, buffer, sizeof(ssd1306_addressing_mode_t));
+    buffer += sizeof(ssd1306_addressing_mode_t);
+    memcpy(&screen.twi_selected, buffer, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+    memcpy(&screen.twi_index, buffer, sizeof(uint8_t));
+    buffer += sizeof(uint8_t);
+
     return true;
 }
 
