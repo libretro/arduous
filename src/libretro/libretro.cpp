@@ -155,15 +155,31 @@ void retro_run(void) {
 }
 
 // TODO(jmaroeder): support serialize/unserialize to enable savestates and rewind
-size_t retro_get_memory_size(unsigned id) { return 0; }
 size_t retro_serialize_size(void) { return arduous->getSaveSize(); }
 bool retro_serialize(void* data, size_t size) { return arduous->save(data, size); }
 bool retro_unserialize(const void* data, size_t size) { return arduous->load(data, size); }
+
+size_t retro_get_memory_size(unsigned id) {
+    switch(id)
+    {
+    case RETRO_MEMORY_SYSTEM_RAM: // System Memory
+	return arduous->getRamSize();
+    }
+    return 0;
+}
+
+void* retro_get_memory_data(unsigned id) {
+    switch(id)
+    {
+    case RETRO_MEMORY_SYSTEM_RAM: // System Memory
+	return arduous->getRam();
+    }
+    return 0;
+}
 
 // libretro unused api functions
 void retro_cheat_reset(void) {}
 void retro_cheat_set(unsigned index, bool enabled, const char* code) {}
 bool retro_load_game_special(unsigned game_type, const struct retro_game_info* info, size_t num_info) { return false; }
 void retro_set_controller_port_device(unsigned port, unsigned device) {}
-void* retro_get_memory_data(unsigned id) { return nullptr; }
 void retro_deinit(void) {}

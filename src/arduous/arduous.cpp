@@ -250,6 +250,14 @@ bool Arduous::load(const void* data, size_t size) {
     return true;
 }
 
+size_t Arduous::getRamSize() {
+    return cpu->ramend + 1;
+}
+
+void *Arduous::getRam() {
+    return cpu->data;
+}
+
 int16_t Arduous::getCurrentSpeakerSample() {
     switch (speakerPins.to_ulong()) {
         case 0:

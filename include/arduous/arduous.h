@@ -53,6 +53,9 @@ class Arduous {
     bool save(void* data, size_t size);
     bool load(const void* data, size_t size);
 
+    size_t getRamSize();
+    void *getRam();
+
    private:
     // Atcore cpu;
     avr_t* cpu;
