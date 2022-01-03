@@ -93,7 +93,7 @@ unsigned retro_get_region(void) { return RETRO_REGION_NTSC; }
 void retro_set_environment(retro_environment_t cb) {
     environ_cb = cb;
 
-    bool no_rom = true;
+    bool no_rom = false;
     cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_rom);
 }
 
