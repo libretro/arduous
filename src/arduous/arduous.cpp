@@ -29,12 +29,150 @@ Arduous::Arduous() = default;
 //     }
 // }
 
-void Arduous::loadHexFile(std::string path) {
+    // decode line text hex to binary
+static int read_hex_string_buf(const char * src, const char *end, uint8_t * buffer, int maxlen)
+{
+    uint8_t * dst = buffer;
+    int ls = 0;
+    uint8_t b = 0;
+    while (src < end && maxlen) {
+        char c = *src++;
+        switch (c) {
+            case 'a' ... 'f':   b = (b << 4) | (c - 'a' + 0xa); break;
+            case 'A' ... 'F':   b = (b << 4) | (c - 'A' + 0xa); break;
+            case '0' ... '9':   b = (b << 4) | (c - '0'); break;
+            default:
+                if (c > ' ') {
+                    fprintf(stderr, "%s: huh '%c' (%s)\n", __FUNCTION__, c, src);
+                    return -1;
+                }
+                continue;
+        }
+        if (ls & 1) {
+            *dst++ = b; b = 0;
+            maxlen--;
+        }
+        ls++;
+    }
+
+    return dst - buffer;
+}
+
+static int
+read_ihex_chunks_buffer(const char *buf, const char *end,
+		ihex_chunk_p * chunks )
+{
+    if (!buf || !chunks)
+	return -1;
+    uint32_t segment = 0;	// segment address
+    int chunk = 0, max_chunks = 0;
+    const char *nextlineptr = buf;
+    *chunks = NULL;
+
+    while (nextlineptr < end) {
+	const char *lineptr, *lineend;
+	lineptr = nextlineptr;
+
+	// Find end of the line
+	for (lineend = lineptr;
+	     lineend < end && !isspace(*lineend);
+	     lineend++);
+
+	// Find beginning of the next line. Skip all the whitespaces 
+	for (nextlineptr = lineend;
+	     nextlineptr < end && isspace(*nextlineptr);
+	     nextlineptr++);
+	    
+	if (lineptr[0] != ':') {
+	    fprintf(stderr, "AVR: invalid ihex format (%.4s)\n", lineptr);
+	    break;
+	}
+	uint8_t bline[64];
+
+	int len = read_hex_string_buf(lineptr + 1, lineend,
+				      bline, sizeof(bline));
+	if (len <= 0)
+	    continue;
+
+	uint8_t chk = 0;
+	{	// calculate checksum
+	    uint8_t * src = bline;
+	    int tlen = len-1;
+	    while (tlen--)
+		chk += *src++;
+	    chk = 0x100 - chk;
+	}
+	if (chk != bline[len-1]) {
+	    fprintf(stderr, "%s: invalid checksum %02x/%02x\n", __FUNCTION__, chk, bline[len-1]);
+	    break;
+	}
+	uint32_t addr = 0;
+	switch (bline[3]) {
+	case 0: // normal data
+	    addr = segment | (bline[1] << 8) | bline[2];
+	    break;
+	case 1: // end of file
+	    continue;
+	case 2: // extended address 2 bytes
+	    segment = ((bline[4] << 8) | bline[5]) << 4;
+	    continue;
+	case 4:
+	    segment = ((bline[4] << 8) | bline[5]) << 16;
+	    continue;
+	default:
+	    fprintf(stderr, "%s: unsupported check type %02x\n", __FUNCTION__, bline[3]);
+	    continue;
+	}
+	if (chunk < max_chunks && addr != ((*chunks)[chunk].baseaddr + (*chunks)[chunk].size)) {
+	    if ((*chunks)[chunk].size)
+		chunk++;
+	}
+	if (chunk >= max_chunks) {
+	    max_chunks++;
+	    /* Here we allocate and zero an extra chunk, to act as terminator */
+	    *chunks = (ihex_chunk_p)realloc(*chunks, (1 + max_chunks) * sizeof(ihex_chunk_t));
+	    memset(*chunks + chunk, 0,
+		   (1 + (max_chunks - chunk)) * sizeof(ihex_chunk_t));
+	    (*chunks)[chunk].baseaddr = addr;
+	}
+	(*chunks)[chunk].data = (uint8_t *) realloc((*chunks)[chunk].data,
+					(*chunks)[chunk].size + bline[0]);
+	memcpy((*chunks)[chunk].data + (*chunks)[chunk].size,
+	       bline + 4, bline[0]);
+	(*chunks)[chunk].size += bline[0];
+    }
+    return max_chunks;
+}
+
+
+static uint8_t *
+read_ihex_buffer(const char *data, size_t sz, uint32_t * dsize, uint32_t * start)
+{
+	ihex_chunk_p chunks = NULL;
+	int count = read_ihex_chunks_buffer(data, data + sz, &chunks);
+	uint8_t * res = NULL;
+
+	if (count > 0) {
+		*dsize = chunks[0].size;
+		*start = chunks[0].baseaddr;
+		res = chunks[0].data;
+		chunks[0].data = NULL;
+	}
+	if (count > 1) {
+		fprintf(stderr, "AVR: ihex contains more chunks than loaded (%d)\n",
+				count);
+	}
+	free_ihex_chunks(chunks);
+	return res;
+}
+
+
+void Arduous::loadHexBuffer(const char *buf, size_t sz) {
     uint32_t bootSize;
     uint32_t bootBase;
-    uint8_t* boot = read_ihex_file(path.c_str(), &bootSize, &bootBase);
+    uint8_t* boot = read_ihex_buffer(buf, sz, &bootSize, &bootBase);
     if (!boot) {
-        fprintf(stderr, "Unable to load %s\n", path.c_str());
+        fprintf(stderr, "Unable to load buffer\n");
         exit(1);
     }
 

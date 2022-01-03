@@ -79,9 +79,8 @@ bool retro_load_game(const struct retro_game_info* info) {
 
     environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
 
-    if (info && info->path) {
-        // arduous->loadFirmware(info->path);
-        arduous->loadHexFile(info->path);
+    if (info && info->data) {
+        arduous->loadHexBuffer((const char *)info->data, info->size);
     }
 
     return true;
@@ -123,7 +122,7 @@ void retro_get_system_info(struct retro_system_info* info) {
     memset(info, 0, sizeof(retro_system_info));
     info->library_name = "arduous";
     info->library_version = "0.1.0";
-    info->need_fullpath = true;      // TODO(jmaroeder): rewrite hex loading to work without fullpath
+    info->need_fullpath = false;
     info->valid_extensions = "hex";  // TODO(jmaroeder): handle .arduboy ZIP files
 }
 

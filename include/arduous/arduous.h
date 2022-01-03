@@ -38,9 +38,7 @@ class Arduous {
     Arduous& operator=(Arduous&&) = delete;
     ~Arduous() = default;
 
-    void loadFirmware(std::string path);
-    void loadHex(std::string hexString);
-    void loadHexFile(std::string path);
+    void loadHexBuffer(const char *data, size_t sz);
     void init(uint8_t* boot, uint32_t bootSize, uint32_t bootBase);
     void reset();
     void emulateFrame();
