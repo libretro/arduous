@@ -137,7 +137,7 @@ void retro_get_system_av_info(struct retro_system_av_info* info) {
     info->geometry.aspect_ratio = FRAME_ASPECT;
 }
 
-void retro_reset(void) { arduous.reset(); }
+void retro_reset(void) { arduous->reset(); }
 
 void retro_run(void) {
     ArduousButtonState buttonState;

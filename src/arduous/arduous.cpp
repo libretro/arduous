@@ -216,7 +216,7 @@ void Arduous::init(uint8_t* boot, uint32_t bootBase, uint32_t bootSize) {
 }
 
 void Arduous::reset() {
-    // avr_load_firmware(cpu, &firmware);
+    cpu->pc = cpu->reset_pc;
 }
 
 void Arduous::emulateFrame() {
