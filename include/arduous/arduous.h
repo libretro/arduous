@@ -38,9 +38,7 @@ class Arduous {
     Arduous& operator=(Arduous&&) = delete;
     ~Arduous() = default;
 
-    void loadFirmware(std::string path);
-    void loadHex(std::string hexString);
-    void loadHexFile(std::string path);
+    void loadHexBuffer(const char *data, size_t sz);
     void init(uint8_t* boot, uint32_t bootSize, uint32_t bootBase);
     void reset();
     void emulateFrame();
@@ -52,6 +50,11 @@ class Arduous {
     size_t getSaveSize();
     bool save(void* data, size_t size);
     bool load(const void* data, size_t size);
+
+    size_t getRamSize();
+    void *getRam();
+    size_t getEEPROMSize();
+    void *getEEPROM();
 
    private:
     // Atcore cpu;

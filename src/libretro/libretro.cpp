@@ -79,9 +79,8 @@ bool retro_load_game(const struct retro_game_info* info) {
 
     environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
 
-    if (info && info->path) {
-        // arduous->loadFirmware(info->path);
-        arduous->loadHexFile(info->path);
+    if (info && info->data) {
+        arduous->loadHexBuffer((const char *)info->data, info->size);
     }
 
     return true;
@@ -94,7 +93,7 @@ unsigned retro_get_region(void) { return RETRO_REGION_NTSC; }
 void retro_set_environment(retro_environment_t cb) {
     environ_cb = cb;
 
-    bool no_rom = true;
+    bool no_rom = false;
     cb(RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME, &no_rom);
 }
 
@@ -123,7 +122,7 @@ void retro_get_system_info(struct retro_system_info* info) {
     memset(info, 0, sizeof(retro_system_info));
     info->library_name = "arduous";
     info->library_version = "0.1.0";
-    info->need_fullpath = true;      // TODO(jmaroeder): rewrite hex loading to work without fullpath
+    info->need_fullpath = false;
     info->valid_extensions = "hex";  // TODO(jmaroeder): handle .arduboy ZIP files
 }
 
@@ -138,7 +137,7 @@ void retro_get_system_av_info(struct retro_system_av_info* info) {
     info->geometry.aspect_ratio = FRAME_ASPECT;
 }
 
-void retro_reset(void) { arduous.reset(); }
+void retro_reset(void) { arduous->reset(); }
 
 void retro_run(void) {
     ArduousButtonState buttonState;
@@ -154,16 +153,35 @@ void retro_run(void) {
     update_audio();
 }
 
-// TODO(jmaroeder): support serialize/unserialize to enable savestates and rewind
-size_t retro_get_memory_size(unsigned id) { return 0; }
 size_t retro_serialize_size(void) { return arduous->getSaveSize(); }
 bool retro_serialize(void* data, size_t size) { return arduous->save(data, size); }
 bool retro_unserialize(const void* data, size_t size) { return arduous->load(data, size); }
+
+size_t retro_get_memory_size(unsigned id) {
+    switch(id)
+    {
+    case RETRO_MEMORY_SYSTEM_RAM: // System Memory
+	return arduous->getRamSize();
+    case RETRO_MEMORY_SAVE_RAM: // EEPROM
+	return arduous->getEEPROMSize();
+    }
+    return 0;
+}
+
+void* retro_get_memory_data(unsigned id) {
+    switch(id)
+    {
+    case RETRO_MEMORY_SYSTEM_RAM: // System Memory
+	return arduous->getRam();
+    case RETRO_MEMORY_SAVE_RAM: // EEPROM
+	return arduous->getEEPROM();
+    }
+    return 0;
+}
 
 // libretro unused api functions
 void retro_cheat_reset(void) {}
 void retro_cheat_set(unsigned index, bool enabled, const char* code) {}
 bool retro_load_game_special(unsigned game_type, const struct retro_game_info* info, size_t num_info) { return false; }
 void retro_set_controller_port_device(unsigned port, unsigned device) {}
-void* retro_get_memory_data(unsigned id) { return nullptr; }
 void retro_deinit(void) {}
