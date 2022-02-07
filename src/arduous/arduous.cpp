@@ -465,7 +465,7 @@ void Arduous::extendAudioBuffer() {
     int endSampleIndex = 2 * std::min((cpu->cycle - frameStartCycle) / cyclesPerAudioSample,
                                       static_cast<uint64_t>(audioSamplesPerVideoFrame));
     int16_t currentSample = getCurrentSpeakerSample();
-    for (uint i = audioBuffer.size(); i < endSampleIndex; i++) {
+    for (unsigned int i = audioBuffer.size(); i < endSampleIndex; i++) {
         audioBuffer.push_back(currentSample);
     }
 }
