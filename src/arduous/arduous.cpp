@@ -182,7 +182,7 @@ void Arduous::loadHexBuffer(const char *buf, size_t sz) {
 void Arduous::init(uint8_t* boot, uint32_t bootBase, uint32_t bootSize) {
     cpu = avr_make_mcu_by_name(mmcu.c_str());
 
-    fprintf(stderr, "%s booloader 0x%05x: %d bytes\n", mmcu.c_str(), bootBase, bootSize);
+    fprintf(stderr, "%s booloader 0x%05x: %d bytes\n", mmcu.c_str(), (unsigned) bootBase, (int) bootSize);
 
     avr_init(cpu);
 
