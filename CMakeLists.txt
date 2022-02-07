@@ -39,6 +39,8 @@ target_include_directories(
     PUBLIC ${CMAKE_SOURCE_DIR}/simavr/examples/parts
 )
 
+set_property(TARGET arduous_libretro PROPERTY C_STANDARD 99)
+
 target_sources(arduous_libretro PRIVATE
   ${CMAKE_SOURCE_DIR}/simavr/simavr/sim/avr_acomp.c
   ${CMAKE_SOURCE_DIR}/simavr/simavr/sim/avr_adc.c
