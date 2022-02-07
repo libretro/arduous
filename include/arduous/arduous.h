@@ -8,7 +8,9 @@
 #include <vector>
 
 #include "sim_avr.h"
+extern "C" {
 #include "ssd1306_virt.h"
+}
 
 constexpr unsigned int TIMING_FPS = 60;
 constexpr unsigned int TIMING_SAMPLE_RATE = 48000;

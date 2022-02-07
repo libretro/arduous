@@ -14,7 +14,6 @@
 #include "sim_avr.h"
 #include "sim_elf.h"
 #include "sim_hex.h"
-#include "ssd1306_virt.h"
 
 void noOpSleep(avr_t* avr, avr_cycle_count_t how_long) {}
 
