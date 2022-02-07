@@ -18,7 +18,18 @@ file(GLOB_RECURSE SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 # list(REMOVE_ITEM SOURCE_FILES_NO_MAIN ${CMAKE_SOURCE_DIR}/src/main.cpp)
 # set(SOURCE_FILES ${SOURCE_FILES_NO_MAIN} ${CMAKE_SOURCE_DIR}/src/main.cpp)
 
+if(${LIBRETRO_STATIC})
+add_library(arduous_libretro STATIC ${INCLUDE_FILES} ${SOURCE_FILES})
+else()
 add_library(arduous_libretro SHARED ${INCLUDE_FILES} ${SOURCE_FILES})
+endif()
+if (ANDROID)
+    set_target_properties(arduous_libretro PROPERTIES SUFFIX "_android.so")
+elseif(EMSCRIPTEN)
+    set_target_properties(arduous_libretro PROPERTIES SUFFIX "${LIBRETRO_SUFFIX}.bc")
+elseif(LIBRETRO_STATIC)
+    set_target_properties(arduous_libretro PROPERTIES SUFFIX "${LIBRETRO_SUFFIX}.a")
+endif ()
 
 find_library(LIB_ELF elf)
 
