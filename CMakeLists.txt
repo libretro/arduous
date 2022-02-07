@@ -112,6 +112,13 @@ target_sources(arduous_libretro PRIVATE
   ${CMAKE_SOURCE_DIR}/src/sim_fake_gdb.c
   )
 
+# Include a strsep for some platforms where it's missing (Windows, maybe others)
+include(CheckSymbolExists)
+check_symbol_exists(strsep "string.h" HAVE_STRSEP)
+if (NOT HAVE_STRSEP)
+    target_sources(arduous_libretro PRIVATE ${CMAKE_SOURCE_DIR}/src/strsep.c)
+endif ()
+
 set(CMAKE_EXE_LINKER_FLAGS "-T ${LINKER_SCRIPT}")
 set_target_properties(arduous_libretro PROPERTIES PREFIX "")
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/libretro/libretro.cpp PROPERTIES OBJECT_DEPENDS ${LINKER_SCRIPT})
