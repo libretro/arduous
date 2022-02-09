@@ -119,6 +119,17 @@ if (NOT HAVE_STRSEP)
     target_sources(arduous_libretro PRIVATE ${CMAKE_SOURCE_DIR}/src/strsep.c)
 endif ()
 
+if (LIBRETRO)
+  execute_process(COMMAND git rev-parse --short HEAD
+    OUTPUT_VARIABLE GIT_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET)
+  if ("${GIT_VERSION}" STREQUAL "")
+    set(GIT_VERSION "unknown")
+  endif ()
+  add_definitions(-DGIT_VERSION=" ${GIT_VERSION}")
+endif ()
+
 set(CMAKE_EXE_LINKER_FLAGS "-T ${LINKER_SCRIPT}")
 set_target_properties(arduous_libretro PROPERTIES PREFIX "")
 set_source_files_properties(${CMAKE_SOURCE_DIR}/src/libretro/libretro.cpp PROPERTIES OBJECT_DEPENDS ${LINKER_SCRIPT})
