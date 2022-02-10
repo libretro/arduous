@@ -121,7 +121,10 @@ void retro_init(void) {
 void retro_get_system_info(struct retro_system_info* info) {
     memset(info, 0, sizeof(retro_system_info));
     info->library_name = "arduous";
-    info->library_version = "0.1.0";
+#ifndef GIT_VERSION
+#define GIT_VERSION ""
+#endif
+    info->library_version = "0.1.0" GIT_VERSION;
     info->need_fullpath = false;
     info->valid_extensions = "hex";  // TODO(jmaroeder): handle .arduboy ZIP files
 }

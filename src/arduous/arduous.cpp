@@ -14,7 +14,6 @@
 #include "sim_avr.h"
 #include "sim_elf.h"
 #include "sim_hex.h"
-#include "ssd1306_virt.h"
 
 void noOpSleep(avr_t* avr, avr_cycle_count_t how_long) {}
 
@@ -183,7 +182,7 @@ void Arduous::loadHexBuffer(const char *buf, size_t sz) {
 void Arduous::init(uint8_t* boot, uint32_t bootBase, uint32_t bootSize) {
     cpu = avr_make_mcu_by_name(mmcu.c_str());
 
-    fprintf(stderr, "%s booloader 0x%05x: %d bytes\n", mmcu.c_str(), bootBase, bootSize);
+    fprintf(stderr, "%s booloader 0x%05x: %d bytes\n", mmcu.c_str(), (unsigned) bootBase, (int) bootSize);
 
     avr_init(cpu);
 
@@ -466,7 +465,7 @@ void Arduous::extendAudioBuffer() {
     int endSampleIndex = 2 * std::min((cpu->cycle - frameStartCycle) / cyclesPerAudioSample,
                                       static_cast<uint64_t>(audioSamplesPerVideoFrame));
     int16_t currentSample = getCurrentSpeakerSample();
-    for (uint i = audioBuffer.size(); i < endSampleIndex; i++) {
+    for (unsigned int i = audioBuffer.size(); i < endSampleIndex; i++) {
         audioBuffer.push_back(currentSample);
     }
 }
