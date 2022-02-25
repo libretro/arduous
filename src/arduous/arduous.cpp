@@ -259,6 +259,17 @@ void Arduous::setButtonState(ArduousButtonState newButtonState) {
 
 std::bitset<DISPLAY_WIDTH * DISPLAY_HEIGHT> Arduous::getVideoFrameBuffer() {
     std::bitset<DISPLAY_WIDTH * DISPLAY_HEIGHT> fb;
+    int muly = +1, mulx = +1;
+    int add = 0;
+    if(ssd1306_get_flag(&screen, SSD1306_FLAG_COM_SCAN_NORMAL)) {
+	muly = -1;
+	add += DISPLAY_WIDTH * (DISPLAY_HEIGHT - 1);
+    }
+
+    if (ssd1306_get_flag(&screen, SSD1306_FLAG_SEGMENT_REMAP_0)) {
+	mulx = -1;
+	add += DISPLAY_WIDTH - 1;
+    }
 
     for (int p = 0; p < screen.pages; p++) {
         for (int c = 0; c < screen.columns; c++) {
@@ -266,7 +277,7 @@ std::bitset<DISPLAY_WIDTH * DISPLAY_HEIGHT> Arduous::getVideoFrameBuffer() {
 
             for (int i = 0; i < 8; i++) {
                 if (vram_byte & (1 << i)) {
-                    fb[(p * 8 + i) * DISPLAY_WIDTH + c] = true;
+                    fb[(p * 8 + i) * DISPLAY_WIDTH * muly + c * mulx + add] = true;
                 }
             }
         }
