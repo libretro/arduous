@@ -167,6 +167,8 @@ size_t retro_get_memory_size(unsigned id) {
 	return arduous->getRamSize();
     case RETRO_MEMORY_SAVE_RAM: // EEPROM
 	return arduous->getEEPROMSize();
+    case RETRO_MEMORY_VIDEO_RAM: // VRAM
+	return arduous->getVideoRAMSize();
     }
     return 0;
 }
@@ -178,6 +180,8 @@ void* retro_get_memory_data(unsigned id) {
 	return arduous->getRam();
     case RETRO_MEMORY_SAVE_RAM: // EEPROM
 	return arduous->getEEPROM();
+    case RETRO_MEMORY_VIDEO_RAM: // VRAM
+	return arduous->getVideoRAM();
     }
     return 0;
 }

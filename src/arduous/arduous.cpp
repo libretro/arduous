@@ -445,6 +445,14 @@ void *Arduous::getEEPROM() {
     return d.ee;
 }
 
+size_t Arduous::getVideoRAMSize() {
+    return sizeof(screen.vram);
+}
+
+void *Arduous::getVideoRAM() {
+    return screen.vram;
+}
+
 int16_t Arduous::getCurrentSpeakerSample() {
     switch (speakerPins.to_ulong()) {
         case 0:
