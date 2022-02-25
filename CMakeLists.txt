@@ -66,46 +66,7 @@ target_sources(arduous_libretro PRIVATE
   ${CMAKE_SOURCE_DIR}/simavr/simavr/sim/sim_irq.c
   ${CMAKE_SOURCE_DIR}/simavr/simavr/sim/sim_utils.c
   ${CMAKE_SOURCE_DIR}/simavr/simavr/sim/sim_vcd_file.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega1280.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega1281.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega1284.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega128.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega128rfa1.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega128rfr2.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega164.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega168.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega169.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega16.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega16m1.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega2560.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega324a.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega324.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega328.c
-#  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega328pb.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega32.c
   ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega32u4.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega48.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega644.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega64m1.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega88.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_mega8.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_megax4.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_megax8.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_megax.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_megaxm1.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_tiny13.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_tiny2313a.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_tiny2313.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_tiny24.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_tiny25.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_tiny4313.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_tiny44.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_tiny45.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_tiny84.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_tiny85.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_tinyx4.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_tinyx5.c
-  ${CMAKE_SOURCE_DIR}/simavr/simavr/cores/sim_usb162.c
 
   ${CMAKE_SOURCE_DIR}/simavr/examples/parts/ssd1306_virt.c
 
