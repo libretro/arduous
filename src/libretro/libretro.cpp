@@ -12,14 +12,28 @@ constexpr int FRAME_WIDTH = 128;
 constexpr int FRAME_HEIGHT = 64;
 constexpr float FRAME_ASPECT = 2.0f;
 
-uint16_t fb[FRAME_WIDTH * FRAME_HEIGHT];
-int16_t audio_buffer[TIMING_SAMPLE_RATE / TIMING_FPS * 2];
+#define USE_RGB565
 
-static inline uint16_t rgb565(uint8_t r, uint8_t g, uint8_t b) {
+#ifdef USE_RGB565
+typedef uint16_t pixel_t;
+
+static inline pixel_t arduous_rgb(uint8_t r, uint8_t g, uint8_t b) {
     return ((r >> 3U) << 11U) | ((g >> 2U) << 5U) | ((b >> 3U) << 0U);
 }
-#define WHITE rgb565(255, 255, 255)
-#define BLACK rgb565(0, 0, 0)
+#else
+typedef uint32_t pixel_t;
+
+static inline pixel_t arduous_rgb(uint8_t r, uint8_t g, uint8_t b) {
+    return (r << 16U) | (g << 8U) | (b);
+}
+#endif
+
+static pixel_t fb[FRAME_WIDTH * FRAME_HEIGHT];
+static int16_t audio_buffer[TIMING_SAMPLE_RATE / TIMING_FPS * 2];
+
+static inline pixel_t arduous_gray(uint8_t y) {
+    return arduous_rgb(y, y, y);
+}
 
 static void fallback_log(enum retro_log_level level, const char* fmt, ...) {
     va_list va;
@@ -43,14 +57,17 @@ std::unique_ptr<T> make_unique(Args&&... args) {
 std::unique_ptr<Arduous> arduous;
 
 void update_video() {
-    memset(fb, BLACK, sizeof(uint16_t) * FRAME_WIDTH * FRAME_HEIGHT);
+    memset(fb, 0, sizeof(pixel_t) * FRAME_WIDTH * FRAME_HEIGHT);
     auto bit_fb = arduous->getVideoFrameBuffer();
+    std::pair<uint8_t, uint8_t> cols = arduous->getVideoColors();
+    pixel_t fg = arduous_gray(cols.first), bg = arduous_gray(cols.second);
+    
     for (int y = 0; y < FRAME_HEIGHT; y++) {
         for (int x = 0; x < FRAME_WIDTH; x++) {
-            fb[y * FRAME_WIDTH + x] = bit_fb[y * FRAME_WIDTH + x] ? WHITE : BLACK;
+            fb[y * FRAME_WIDTH + x] = bit_fb[y * FRAME_WIDTH + x] ? fg : bg;
         }
     }
-    video_cb((void*)fb, FRAME_WIDTH, FRAME_HEIGHT, FRAME_WIDTH * sizeof(uint16_t));
+    video_cb((void *)fb, FRAME_WIDTH, FRAME_HEIGHT, FRAME_WIDTH * sizeof(pixel_t));
 }
 
 void update_audio() {
@@ -61,7 +78,11 @@ void update_audio() {
 unsigned retro_api_version(void) { return RETRO_API_VERSION; }
 
 bool retro_load_game(const struct retro_game_info* info) {
+#ifdef USE_RGB565
     int pixel_format = RETRO_PIXEL_FORMAT_RGB565;
+#else
+    int pixel_format = RETRO_PIXEL_FORMAT_XRGB8888;
+#endif    
     if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &pixel_format)) {
         log_cb(RETRO_LOG_INFO, "XRGB8888 is not supported.\n");
         return false;

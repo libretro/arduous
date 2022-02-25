@@ -48,6 +48,7 @@ class Arduous {
     void setButtonState(ArduousButtonState newButtonState);
 
     std::bitset<DISPLAY_WIDTH * DISPLAY_HEIGHT> getVideoFrameBuffer();
+    std::pair<uint8_t, uint8_t> getVideoColors();
     std::vector<int16_t> getAudioBuffer();
     size_t getSaveSize();
     bool save(void* data, size_t size);

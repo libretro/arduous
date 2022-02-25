@@ -257,6 +257,16 @@ void Arduous::setButtonState(ArduousButtonState newButtonState) {
                       (!newButtonState.buttonLeft << 5) | (!newButtonState.buttonDown << 4) | (cpu->data[PINF] & 0x0F);
 }
 
+std::pair<uint8_t, uint8_t> Arduous::getVideoColors() {
+    	// Setup drawing colour
+	bool invert = ssd1306_get_flag (&screen, SSD1306_FLAG_DISPLAY_INVERTED);
+	uint8_t y = ((screen.contrast_register + 256) * 255) / 512;
+	if (invert) {
+	    return std::make_pair(0, y);
+	}
+	return std::make_pair(y, 0);
+}
+
 std::bitset<DISPLAY_WIDTH * DISPLAY_HEIGHT> Arduous::getVideoFrameBuffer() {
     std::bitset<DISPLAY_WIDTH * DISPLAY_HEIGHT> fb;
     int muly = +1, mulx = +1;
