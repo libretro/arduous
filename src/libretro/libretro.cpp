@@ -12,7 +12,8 @@ constexpr int FRAME_WIDTH = 128;
 constexpr int FRAME_HEIGHT = 64;
 constexpr float FRAME_ASPECT = 2.0f;
 
-#define USE_RGB565
+#undef USE_RGB565
+#define USE_RGB565 1
 
 #ifdef USE_RGB565
 typedef uint16_t pixel_t;
