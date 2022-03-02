@@ -64,6 +64,10 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/vita-static-cmake.yml'
 
+  # WiiU
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/wiiu-static-cmake.yml'
+
   # tvOS
   - project: 'libretro-infrastructure/ci-templates'
     file: '/tvos-cmake.yml'
@@ -200,6 +204,12 @@ libretro-build-vita:
 libretro-build-tvos-arm64:
   extends:
     - .libretro-tvos-cmake-arm64
+    - .core-defs
+
+# WiiU
+libretro-build-wiiu:
+  extends:
+    - .libretro-wiiu-static-cmake-retroarch-master
     - .core-defs
 
 # Dingux
