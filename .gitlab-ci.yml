@@ -38,6 +38,10 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/linux-cmake.yml'
 
+  # DJGPP
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/djgpp-static-cmake.yml'
+
   ################################## CELLULAR ################################
   # Android
   - project: 'libretro-infrastructure/ci-templates'
@@ -137,6 +141,12 @@ libretro-build-osx-aarch64:
     MACOSX_DEPLOYMENT_TARGET: "10.9"
     ARCH: aarch64
     CMAKE: cmake
+
+# DJGPP
+libretro-build-djgpp:
+  extends:
+    - .libretro-djgpp-static-cmake-retroarch-master
+    - .core-defs
 
 ################################### CELLULAR #################################
 # Android ARMv7a
