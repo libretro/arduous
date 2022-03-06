@@ -80,6 +80,14 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/dingux-cmake.yml'
 
+  # Wii
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/wii-static-cmake.yml'
+
+  # Gamecube
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/ngc-static-cmake.yml'
+
   ################################## MISC ####################################
   # Emscripten
   - project: 'libretro-infrastructure/ci-templates'
@@ -246,6 +254,18 @@ libretro-build-retrofw-mips32-odbeta:
 libretro-build-miyoo-arm32:
   extends:
     - .libretro-miyoo-cmake-arm32
+    - .core-defs
+
+# Wii
+libretro-build-wii:
+  extends:
+    - .libretro-wii-static-cmake-retroarch-master
+    - .core-defs
+
+# Gamecube
+libretro-build-ngc:
+  extends:
+    - .libretro-ngc-static-cmake-retroarch-master
     - .core-defs
 
 ################################### MISC #####################################
