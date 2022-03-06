@@ -38,6 +38,10 @@ include:
   - project: 'libretro-infrastructure/ci-templates'
     file: '/linux-cmake.yml'
 
+  # DJGPP
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/djgpp-static-cmake.yml'
+
   ################################## CELLULAR ################################
   # Android
   - project: 'libretro-infrastructure/ci-templates'
@@ -75,6 +79,14 @@ include:
   # Dingux
   - project: 'libretro-infrastructure/ci-templates'
     file: '/dingux-cmake.yml'
+
+  # Wii
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/wii-static-cmake.yml'
+
+  # Gamecube
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/ngc-static-cmake.yml'
 
   ################################## MISC ####################################
   # Emscripten
@@ -137,6 +149,12 @@ libretro-build-osx-aarch64:
     MACOSX_DEPLOYMENT_TARGET: "10.9"
     ARCH: aarch64
     CMAKE: cmake
+
+# DJGPP
+libretro-build-djgpp:
+  extends:
+    - .libretro-djgpp-static-cmake-retroarch-master
+    - .core-defs
 
 ################################### CELLULAR #################################
 # Android ARMv7a
@@ -236,6 +254,18 @@ libretro-build-retrofw-mips32-odbeta:
 libretro-build-miyoo-arm32:
   extends:
     - .libretro-miyoo-cmake-arm32
+    - .core-defs
+
+# Wii
+libretro-build-wii:
+  extends:
+    - .libretro-wii-static-cmake-retroarch-master
+    - .core-defs
+
+# Gamecube
+libretro-build-ngc:
+  extends:
+    - .libretro-ngc-static-cmake-retroarch-master
     - .core-defs
 
 ################################### MISC #####################################
