@@ -19,7 +19,11 @@ constexpr float FRAME_ASPECT = 2.0f;
 typedef uint16_t pixel_t;
 
 static inline pixel_t arduous_rgb(uint8_t r, uint8_t g, uint8_t b) {
+#ifdef PS2
+    return ((b & 0xf8) << 7) | ((g & 0xf8) << 2) | ((r & 0xf8) >> 3);
+#else
     return ((r >> 3U) << 11U) | ((g >> 2U) << 5U) | ((b >> 3U) << 0U);
+#endif
 }
 #else
 typedef uint32_t pixel_t;
