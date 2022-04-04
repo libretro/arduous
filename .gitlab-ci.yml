@@ -32,7 +32,7 @@ include:
 
   # MacOS
   - project: 'libretro-infrastructure/ci-templates'
-    file: 'osx-cmake.yml'
+    file: 'osx-cmake-x86.yml'
 
   # Linux
   - project: 'libretro-infrastructure/ci-templates'
@@ -147,8 +147,12 @@ libretro-build-osx-x64:
 # MacOS ARM64
 libretro-build-osx-arm64:
   extends:
-    - .libretro-osx-cmake-arm64
+    - .libretro-osx-cmake
     - .core-defs-osx
+  variables:
+    MACOSX_DEPLOYMENT_TARGET: "10.9"
+    ARCH: aarch64
+    CMAKE: cmake
 
 # DJGPP
 libretro-build-djgpp-i586:
