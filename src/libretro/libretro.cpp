@@ -178,6 +178,7 @@ void retro_run(void) {
     buttonState.buttonB = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B);
     arduous->setButtonState(buttonState);
     arduous->emulateFrame();
+    input_poll_cb();
     update_video();
     update_audio();
 }
