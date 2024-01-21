@@ -13,7 +13,7 @@ extern "C" {
 }
 
 constexpr unsigned int TIMING_FPS = 60;
-constexpr unsigned int TIMING_SAMPLE_RATE = 48000;
+constexpr unsigned int TIMING_SAMPLE_RATE = 16000;
 constexpr unsigned int DISPLAY_WIDTH = 128;
 constexpr unsigned int DISPLAY_HEIGHT = 64;
 
