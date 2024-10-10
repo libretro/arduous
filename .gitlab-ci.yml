@@ -17,12 +17,6 @@
   variables:
     CORE_ARGS: -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE -DCMAKE_BUILD_TYPE=Release
 
-.core-defs-osx:
-  extends: .core-defs
-  variables:
-    CORE_ARGS: -G Xcode -DCMAKE_BUILD_TYPE=Release
-    EXTRA_PATH: Release
-
 # Inclusion templates, required for the build to work
 include:
   ################################## DESKTOPS ################################
@@ -140,19 +134,19 @@ libretro-build-linux-i686:
 libretro-build-osx-x86:
   extends:
     - .libretro-osx-cmake-x86
-    - .core-defs-osx
+    - .core-defs
 
 # MacOS 64-bit
 libretro-build-osx-x64:
   extends:
     - .libretro-osx-cmake-x86_64
-    - .core-defs-osx
+    - .core-defs
 
 # MacOS ARM64
 libretro-build-osx-arm64:
   extends:
     - .libretro-osx-cmake-arm64
-    - .core-defs-osx
+    - .core-defs
 
 # DJGPP
 libretro-build-djgpp-i586:
