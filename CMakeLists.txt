@@ -78,6 +78,12 @@ include(CheckSymbolExists)
 check_symbol_exists(strsep "string.h" HAVE_STRSEP)
 if (NOT HAVE_STRSEP)
     target_sources(arduous_libretro PRIVATE ${CMAKE_SOURCE_DIR}/src/strsep.c)
+
+    if (MINGW)
+        target_compile_options(arduous_libretro PRIVATE
+            -include ${CMAKE_SOURCE_DIR}/src/strsep.h
+        )
+    endif ()
 endif ()
 
 if (LIBRETRO)
